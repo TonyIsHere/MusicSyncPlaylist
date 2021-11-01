@@ -272,7 +272,7 @@ public class AppController {
 					// Link to spotify
 					alrepository.insertNewSpotify(refAlbum.getId(), idAlbum);
 
-					Object[] trackByName = refAlbum.getTracks().stream().filter(x -> (x.getName().contains(nametrack)))
+					Object[] trackByName = refAlbum.getTracks().stream().filter(x -> (x.getName() == nametrack))
 							.toArray();
 					if (trackByName.length == 0) {
 						// create track linked to album
@@ -315,7 +315,7 @@ public class AppController {
 				logmessage += "AlbumSpotify exist Yes | ";
 				Album a = albumSpotify.get(0);
 				List<Track> tracksOfPlaylist = a.getTracks();
-				Object[] trackofAlbum = tracksOfPlaylist.stream().filter(x -> (x.getName().contains(nametrack)))
+				Object[] trackofAlbum = tracksOfPlaylist.stream().filter(x -> (x.getName() == nametrack))
 						.toArray();
 				if (trackofAlbum.length == 0) {
 					// Create Track linked to album

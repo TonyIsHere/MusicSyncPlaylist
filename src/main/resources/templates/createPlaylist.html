@@ -9,6 +9,10 @@
 	rel="stylesheet"
 	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
 	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+	integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+	crossorigin="anonymous" />
 
 <script
 	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
@@ -51,10 +55,11 @@
 		<div class="row" style="margin-top: 10px">
 			<div class="col-md-6 col-sm-12">
 				<h2>Search</h2>
-				<ul class="list-unstyled" style="height: 70vh; overflow-y: auto;">
-					<li th:each="item : ${search}" th:id="${item.id}"
-						class="border rounded" style="padding: 10px; margin-top: 10px">
-						<a target="_blank"
+				<ul class="list-unstyled"
+					style="max-height: 70vh; overflow-y: auto;">
+					<li th:each="item : ${search}" th:id="'item-search-'+${item.id}"
+						class="border rounded item-to-add"
+						style="padding: 10px; margin-top: 10px"><a target="_blank"
 						th:href="'https://open.spotify.com/track/' + ${item.spotify}">Spotify
 							link</a>
 						<div class="d-flex align-items-center">
@@ -65,52 +70,151 @@
 							<div class="flex-grow-1 ms-3">
 								<h5 class="mt-0 mb-1" th:text="${item.name}"></h5>
 								<p th:text="${item.getArtistsString}"></p>
-								<span th:if="${item.preview == Null}"></span> 
-								<span th:unless="${item.preview == Null }">
-								<Button th:attr="onclick=|$('audio').each((i,x) => x.pause());btn_${item.id}.currentTime = 0;btn_${item.id}.play()|" >Play preview</Button>
-								<audio  th:id="'btn_'+${item.id}" controls class="d-none" style="height: revert; width: 100%">
-									<source th:src="${item.preview}" type="audio/mpeg">
-									Your browser does not support the audio element.
-								</audio>
+								<span th:if="${item.preview == Null}"></span> <span
+									th:unless="${item.preview == Null }">
+									<Button th:attr="onclick=|playAudio('${item.id}')|">Play
+										preview</Button> <audio th:id="'btn_'+${item.id}" controls
+										class="d-none" style="height: revert; width: 100%">
+										<source th:src="${item.preview}" type="audio/mpeg">
+										Your browser does not support the audio element.
+									</audio>
 								</span>
 							</div>
-							<button type="button" class="btn btn-success float-right btn-lg">+</button>
-						</div>
-					</li>
+							<button type="button"
+								class="btn btn-success btn-lg float-right btn-add"
+								th:attr="data-id=|${item.id}|">
+								<i class="fa fa-plus"></i>
+							</button>
+						</div></li>
 				</ul>
 			</div>
 			<div class="col-md-6 col-sm-12">
 				<h2>Playlist</h2>
-				<ul class="list-unstyled" style="height: 70vh; overflow-y: auto;">
-					<li class="border rounded" style="padding: 10px; margin-top: 10px">
-						<div class="d-flex align-items-center">
-							<div class="flex-shrink-0">
-								<img
-									src="https://i.scdn.co/image/ab67616d00001e02ab779f2adb1007f0321ecab8"
-									alt="playlist" class="img-thumbnail" style="width: 100px">
-							</div>
-							<div class="flex-grow-1 ms-3">
-								<h5 class="mt-0 mb-1">On sait jamais</h5>
-								<p>PLK, Niska</p>
-								<audio onclick='console.log("dddd")' id="ddd" controls class=""
-									style="height: revert; width: 100%">
-									<source
-										src="https://p.scdn.co/mp3-preview/a527595efe536f1d64d37bcbb7e281dc6d8e4b68?cid=3597042a166c45abb95b0ec082236f0a"
-										type="audio/mpeg">
-									Your browser does not support the audio element.
-								</audio>
-							</div>
-							<button type="button" class="btn btn-danger float-right btn-lg">x</button>
-						</div>
-					</li>
-
-
+				<ul id="playlistContainer" class="list-unstyled"
+					style="max-height: 70vh; overflow-y: auto;">
 				</ul>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 10px; margin-bottom: 10px">
+			<div class="col-12">
+				<button id="btn-save" type="button"
+					class="btn btn-primary float-right btn-lg" style="width: 100%">Create
+					a new playlist</button>
 			</div>
 		</div>
 	</div>
 </body>
 <script type="text/javascript">
+let storage = [];
+let a;
+
+function saveLocal()
+{
+	localStorage.setItem("playlist",JSON.stringify(storage));
 	
+	}
+
+if(localStorage.getItem("playlist"))
+	{
+		storage = JSON.parse(localStorage.getItem("playlist"));
+		for(let i = 0; i < storage.length; i++)
+			{$
+			
+			//Create tmp DOM to convert String to DOM 
+			let tmp = document.createElement("div");
+			tmp.innerHTML = storage[i];
+			let el = tmp.firstChild;
+			
+			//Use Jquery to find the button and add event click
+			$(el).find(".btn-del")[0].addEventListener("click", e =>deleteRow(e))	
+			
+			//Finally add on the view
+			$("#playlistContainer").append(el);
+			}
+	}
+
+$(".item-to-add .btn-add").each((i,x)=>{
+	let id = x.dataset.id;
+	x.addEventListener("click", _ => {
+		
+		
+		let el = $("#item-search-"+id).clone();		//Duplicate the el (otherwise it will be removed of search list)
+		
+		//Change data
+		el.attr("id","item-playlist-"+id);
+	
+		let btnRemove = $($.parseHTML(`<button type="button" class="btn btn-danger float-right btn-lg btn-del" data-id="${id}"><i class="fa fa-times"></i></button>`));
+		btnRemove[0].addEventListener("click", e =>deleteRow(e))
+		el.find(".btn-add").replaceWith(btnRemove);
+		
+		//Create a temp DOM to convert DOM to String
+		let tmp = document.createElement("div");
+		$(tmp).append(el);
+		
+		storage.push($(tmp).html());
+		
+		//Add on the view
+		$("#playlistContainer").append(el);
+		
+		saveLocal();
+			
+	});
+});
+
+
+function playAudio(btnid)
+ {
+	el = document.getElementById("btn_"+btnid);
+	
+	$('audio').each((i,x) => {
+		x.pause()
+		if(x !== el)
+			{
+			x.currentTime = 0;
+			}
+	});
+	console.log(el.currentTime);
+	if(el.currentTime != 0) //On listen
+		{
+		el.pause()
+		el.currentTime = 0;
+		}
+	else
+		{
+		el.currentTime = 0;
+		el.play();
+		}
+ }
+ 
+ 
+ function save()
+{
+	 let playlistItem = []
+	 $("#playlistContainer").children().each((i,x) => {
+		 let id = x.id.split("-")[2];
+		 playlistItem.push(id);
+	 })
+	 console.log(playlistItem);
+	 console.log("save");
+	 
+	 
+	 }
+ 
+ function deleteRow(btnRemove)
+ {
+	 a = btnRemove;
+	 console.log(btnRemove.currentTarget)
+	  console.log(btnRemove.target)
+	 btnRemove = $(btnRemove.currentTarget);
+		//console.log("remove "+id);
+		let elToRemove = btnRemove.parent().parent();
+		storage.splice(elToRemove.index(),1)
+		elToRemove.remove();
+		//btnRemove.parent().parent().remove();
+		saveLocal();
+		
+	}
+ 
+ document.getElementById("btn-save").addEventListener("click",save);
 </script>
 </html>
