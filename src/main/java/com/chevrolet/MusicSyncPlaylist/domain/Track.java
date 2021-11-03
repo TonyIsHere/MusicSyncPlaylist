@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -29,20 +30,21 @@ public class Track {
 	@Column(name = "tra_id")
 	private int id;
 
-	@Column(name = "tra_name")
+	@Column(name = "tra_name",nullable = false)
 	private String name;
 
 	@Column(name = "tra_duration")
 	private int duration;
 
 	@ManyToOne
-	@JoinColumn(name = "tra_alb_id")
+	@JoinColumn(name = "tra_alb_id",nullable = false)
 	private Album album;
 
 	@ManyToMany(cascade = { CascadeType.ALL })
 	@JoinTable(name = "Track_Artist", joinColumns = { @JoinColumn(name = "tra_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "art_id") })
 	Set<Artist> artists = new HashSet<>();
+	
 
 	/*
 	 * Constructor
@@ -98,6 +100,7 @@ public class Track {
 		this.artists = artists;
 	}
 	
+	
 	public String getArtistsString() {
 		String art = ""; // from your method
 		for(Artist x : artists) {
@@ -107,5 +110,8 @@ public class Track {
 		art = art.substring(0,art.length()-2);
 		return art;
 	}
+
+
+	
 
 }

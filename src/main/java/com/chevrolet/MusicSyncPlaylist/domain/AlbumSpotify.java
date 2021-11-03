@@ -14,7 +14,7 @@ public class AlbumSpotify extends Album {
 	/*
 	 * Properties
 	 */
-	@Column(name = "alb_spo_id")
+	@Column(name = "alb_spo_id",nullable = false,length = 22)
 	private String spotify;
 	
 	/*

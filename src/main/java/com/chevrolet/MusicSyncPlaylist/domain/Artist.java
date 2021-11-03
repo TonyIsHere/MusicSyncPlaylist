@@ -27,7 +27,7 @@ public class Artist {
 	@Column(name = "art_id")
 	private int id;
 
-	@Column(name = "art_name")
+	@Column(name = "art_name",nullable = false)
 	private String name;
 
 	@Column(name = "art_pic")

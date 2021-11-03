@@ -32,16 +32,16 @@ public class Album {
 	@Column(name = "alb_id")
 	private int id;
 	
-	@Column(name = "alb_name")
+	@Column(name = "alb_name",nullable = false)
 	private String name;
 	
-	@Column(name = "alb_release_date")
+	@Column(name = "alb_release_date",nullable = false)
 	private LocalDate release;
 	
 	@Column(name = "alb_picture")
 	private String picture;
 	
-	@Column(name = "alb_type")
+	@Column(name = "alb_type",nullable = false,length = 20)
 	private String type;
 
 	

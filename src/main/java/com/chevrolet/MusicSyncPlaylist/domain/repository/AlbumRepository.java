@@ -1,8 +1,10 @@
-package com.chevrolet.MusicSyncPlaylist.domain;
+package com.chevrolet.MusicSyncPlaylist.domain.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import com.chevrolet.MusicSyncPlaylist.domain.Album;
 
 public interface AlbumRepository extends JpaRepository<Album, Integer> {
 	

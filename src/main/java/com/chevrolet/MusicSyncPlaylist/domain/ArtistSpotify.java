@@ -14,7 +14,7 @@ public class ArtistSpotify extends Artist {
 	/*
 	 * Properties
 	 */
-	@Column(name = "art_spo_id")
+	@Column(name = "art_spo_id",nullable = false,length = 22)
 	private String spotify;
 
 	/*

@@ -35,16 +35,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
 import com.chevrolet.MusicSyncPlaylist.domain.Album;
-import com.chevrolet.MusicSyncPlaylist.domain.AlbumRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.AlbumSpotify;
-import com.chevrolet.MusicSyncPlaylist.domain.AlbumSpotifyRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.Artist;
 import com.chevrolet.MusicSyncPlaylist.domain.ArtistSpotify;
-import com.chevrolet.MusicSyncPlaylist.domain.ArtistSpotifyRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.Track;
-import com.chevrolet.MusicSyncPlaylist.domain.TrackRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.TrackSpotify;
-import com.chevrolet.MusicSyncPlaylist.domain.TrackSpotifyRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.AlbumRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.AlbumSpotifyRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.ArtistSpotifyRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.TrackRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.TrackSpotifyRepository;
 
 @Controller
 public class AppController {
