@@ -37,9 +37,7 @@
 					<li th:each="item : ${playlist}"
 						th:id="'item-search-'+${item.primaryKey.track.id}"
 						class="border rounded item-to-add"
-						style="padding: 10px; margin-top: 10px"><a target="_blank"
-						th:href="'https://open.spotify.com/track/' + ${item.primaryKey.track.spotify}">Spotify
-							link</a>
+						style="padding: 10px; margin-top: 10px">
 						<div class="d-flex align-items-center">
 							<div class="flex-shrink-0">
 								<img th:src="${item.primaryKey.track.album.picture}"
@@ -48,8 +46,8 @@
 							<div class="flex-grow-1 ms-3">
 								<h5 class="mt-0 mb-1" th:text="${item.primaryKey.track.name}"></h5>
 								<p th:text="${item.primaryKey.track.getArtistsString}"></p>
-								<span th:if="${item.primaryKey.track.preview == Null}"></span> <span
-									th:unless="${item.primaryKey.track.preview == Null }">
+								<span th:if="${item.primaryKey.track.preview == Null}"></span> 
+								<span th:unless="${item.primaryKey.track.preview == Null }">
 									<Button
 										th:attr="onclick=|playAudio('${item.primaryKey.track.id}')|">Play
 										preview</Button> <audio th:id="'btn_'+${item.primaryKey.track.id}"
@@ -63,7 +61,11 @@
 							<a type="button"th:href="'/track/'+${item.primaryKey.track.id}" class="btn btn-success btn-lg float-right btn-add">
 								more...
 							</a>
-						</div></li>
+						</div>
+						<a target="_blank"
+						th:href="'https://open.spotify.com/track/' + ${item.primaryKey.track.spotify}">Spotify
+							link</a>
+						</li>
 				</ul>
 			</div>
 		</div>

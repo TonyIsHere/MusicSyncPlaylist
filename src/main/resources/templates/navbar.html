@@ -45,7 +45,7 @@
 						<li th:if="${session.id != null}" class="nav-item"><a class="nav-link" href="/profile">Profile</a>
 						</li>
 						
-						<li th:if="${session.id != null}" class="nav-item"><button class="nav-link" type="submit">Sign Out</button>
+						<li th:if="${session.id != null}" class="nav-item"><button class="nav-link" type="submit">Sign Out -  [[${#httpServletRequest.remoteUser}]]</button>
 						</li>
 					</ul>
 				</form>

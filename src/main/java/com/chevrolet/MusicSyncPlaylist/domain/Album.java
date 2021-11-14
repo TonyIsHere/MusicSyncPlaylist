@@ -44,7 +44,6 @@ public class Album {
 	@Column(name = "alb_type",nullable = false,length = 20)
 	private String type;
 
-	
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "album")
 	List<Track> tracks;
 	
@@ -58,7 +57,6 @@ public class Album {
 		
 	}
 	
-	
 	public Album(String name, LocalDate release, String picture, String type) {
 		super();
 		this.name = name;
@@ -67,7 +65,6 @@ public class Album {
 		this.type = type;
 		this.tracks = new ArrayList<Track>();
 	}
-
 
 	/*
 	 * Get/Set
@@ -127,6 +124,4 @@ public class Album {
 	public void setArtists(Set<Artist> artists) {
 		this.artists = artists;
 	}
-	
-	
 }

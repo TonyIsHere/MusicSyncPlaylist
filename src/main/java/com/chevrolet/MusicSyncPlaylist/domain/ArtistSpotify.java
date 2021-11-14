@@ -27,7 +27,6 @@ public class ArtistSpotify extends Artist {
 	public ArtistSpotify(String name, String picture, String desc, String spotify) {
 		super(name, picture, desc);
 		this.spotify = spotify;
-
 	}
 
 	/*

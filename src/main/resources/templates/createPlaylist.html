@@ -29,11 +29,11 @@
 <body>
 	<div th:insert="navbar">...</div>
 	<div class="container">
-	<form id="lol" th:action="@{/api/save}" method="POST"></form>
-		<h3 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h3>
-		<h1 th:text="'New Playlist'"></h1>
+		<!-- Disable component to help JS to work -->
+		<form id="formSave" th:action="@{/api/save}" method="POST"></form>
 		<div id="datajsid" class="d-none" th:text="${session.id}">John
 			Doe</div>
+		<h1>New Playlist</h1>
 		<div class="row">
 			<div class="col-12">
 				<form action="#" th:action="@{/search}" method="GET"
@@ -42,17 +42,14 @@
 						<div class="col-auto">
 							<i class="fas fa-search h4 text-body"></i>
 						</div>
-						<!--end of col-->
 						<div class="col">
 							<input th:name="q" th:value="${param.q}"
 								class="form-control form-control-lg form-control-borderless"
 								type="search" placeholder="Search Track or Artist">
 						</div>
-						<!--end of col-->
 						<div class="col-auto">
 							<button class="btn btn-lg btn-success" type="submit">Search</button>
 						</div>
-						<!--end of col-->
 					</div>
 				</form>
 			</div>
@@ -63,7 +60,6 @@
 					<div class="col-auto">
 						<i class="h4 text-body">Name</i>
 					</div>
-					<!--end of col-->
 					<div class="col">
 						<input id="inputName"
 							class="form-control form-control-lg form-control-borderless"
@@ -126,178 +122,170 @@
 </body>
 <script type="text/javascript">
 let storage = [];
-let a;
 
+//get id from backend
 let idUser = parseInt($(datajsid).html());
 $(datajsid).remove()
 
-function saveLocal()
-{
-	localStorage.setItem("playlist",JSON.stringify(storage));
-	
-	}
+
+/**
+* Save playlist el to localstorage
+*/
+function saveLocal() {
+  localStorage.setItem("playlist", JSON.stringify(storage));
+}
+
+/**
+* Process to load from localstorage
+*/
+if (localStorage.getItem("name")) {
+  inputName.value = localStorage.getItem("name");
+}
+
+if (localStorage.getItem("playlist")) {
+  storage = JSON.parse(localStorage.getItem("playlist"));
+  for (let i = 0; i < storage.length; i++) {
+      //Create tmp DOM to convert String to DOM 
+      let tmp = document.createElement("div");
+      tmp.innerHTML = storage[i];
+      let el = tmp.firstChild;
+
+      //Use Jquery to find the button and add event click
+      $(el).find(".btn-del")[0].addEventListener("click", e => deleteRow(e))
+
+      //Finally add on the view
+      $("#playlistContainer").append(el);
+  }
+}
 
 
-if(localStorage.getItem("name"))
-	{
-	inputName.value =localStorage.getItem("name"); 
-	}
 
-if(localStorage.getItem("playlist"))
-	{
-		storage = JSON.parse(localStorage.getItem("playlist"));
-		for(let i = 0; i < storage.length; i++)
-			{$
-			
-			//Create tmp DOM to convert String to DOM 
-			let tmp = document.createElement("div");
-			tmp.innerHTML = storage[i];
-			let el = tmp.firstChild;
-			
-			//Use Jquery to find the button and add event click
-			$(el).find(".btn-del")[0].addEventListener("click", e =>deleteRow(e))	
-			
-			//Finally add on the view
-			$("#playlistContainer").append(el);
-			}
-	}
+/**
+* Event click to each result row to add to new playlist
+*/
+$(".item-to-add .btn-add").each((i, x) => {
+  let id = x.dataset.id;
+  x.addEventListener("click", _ => {
+      let el = $("#item-search-" + id).clone();		//Duplicate the el (otherwise it will be removed of search list)
 
-$(".item-to-add .btn-add").each((i,x)=>{
-	let id = x.dataset.id;
-	x.addEventListener("click", _ => {
-		
-		
-		let el = $("#item-search-"+id).clone();		//Duplicate the el (otherwise it will be removed of search list)
-		
-		//Change data
-		el.attr("id","item-playlist-"+id);
-	
-		let btnRemove = $($.parseHTML(`<button type="button" class="btn btn-danger float-right btn-lg btn-del" data-id="${id}"><i class="fa fa-times"></i></button>`));
-		btnRemove[0].addEventListener("click", e =>deleteRow(e))
-		el.find(".btn-add").replaceWith(btnRemove);
-		
-		//Create a temp DOM to convert DOM to String
-		let tmp = document.createElement("div");
-		$(tmp).append(el);
-		
-		storage.push($(tmp).html());
-		
-		//Add on the view
-		$("#playlistContainer").append(el);
-		
-		saveLocal();
-			
-	});
+      //Change data
+      el.attr("id", "item-playlist-" + id);
+
+      //Add a btn to remove from the playlist with event 
+      let btnRemove = $($.parseHTML(`<button type="button" class="btn btn-danger float-right btn-lg btn-del" data-id="${id}"><i class="fa fa-times"></i></button>`));
+      btnRemove[0].addEventListener("click", e => deleteRow(e))
+
+      el.find(".btn-add").replaceWith(btnRemove);
+
+      //Create a temp DOM to convert DOM to String
+      let tmp = document.createElement("div");
+      $(tmp).append(el);
+
+      storage.push($(tmp).html());
+
+      //Add on the view
+      $("#playlistContainer").append(el);
+
+      saveLocal();
+  });
 });
 
+/**
+* On click to a play preview btn
+* @param {int} btnid 
+*/
+function playAudio(btnid) {
+  el = document.getElementById("btn_" + btnid); //el clicked
 
-function playAudio(btnid)
- {
-	el = document.getElementById("btn_"+btnid);
-	
-	$('audio').each((i,x) => {
-		x.pause()
-		if(x !== el)
-			{
-			x.currentTime = 0;
-			}
-	});
-	console.log(el.currentTime);
-	if(el.currentTime != 0) //On listen
-		{
-		el.pause()
-		el.currentTime = 0;
-		}
-	else
-		{
-		el.currentTime = 0;
-		el.play();
-		}
- }
- 
- 
- function save()
-{
-	 let playlistItem = []
-	 $("#playlistContainer").children().each((i,x) => {
-		 let id = x.id.split("-")[2];
-		 playlistItem.push(id);
-	 })
-	 
-	 let name = inputName.value;
-	 console.log(name);
-	 console.log(playlistItem);
-	 console.log(idUser);
-	 console.log("save");
-	 
+  $('audio').each((i, x) => {
+      x.pause() //pause  sound of each
+      if (x !== el) { //set time of 0 to el clicked
+          x.currentTime = 0;
+      }
+  });
+  if (el.currentTime != 0) //On listen
+  {
+      el.pause()
+      el.currentTime = 0;
+  }
+  else { //restart
+      el.currentTime = 0; 
+      el.play();
+  }
+}
 
-	 
-	 var f = lol;
-f.setAttribute('method',"post");
-f.setAttribute('action',"api/save");
+/**
+* Save playlist and redirect to playlist page
+*/
+function save() {
+  let playlistItem = []
+  $("#playlistContainer").children().each((i, x) => {
+      let id = x.id.split("-")[2];
+      playlistItem.push(id);
+  })
 
-var i = document.createElement("input"); //input element, text
-i.setAttribute('type',"text");
-i.setAttribute('name',"id");
-i.setAttribute('value',idUser);
-f.appendChild(i);
+  let name = inputName.value;
 
-var i = document.createElement("input"); //input element, text
-i.setAttribute('type',"text");
-i.setAttribute('name',"allTrackId");
-i.setAttribute('value',playlistItem);
-f.appendChild(i);
+  var f = formSave;
+  f.setAttribute('method', "post");
+  f.setAttribute('action', "api/save");
 
-var i = document.createElement("input"); //input element, text
-i.setAttribute('type',"text");
-i.setAttribute('name',"name");
-i.setAttribute('value',name);
-f.appendChild(i);
+  var i = document.createElement("input"); //input element, text
+  i.setAttribute('type', "text");
+  i.setAttribute('name', "id");
+  i.setAttribute('value', idUser);
+  f.appendChild(i);
 
+  var i = document.createElement("input"); //input element, text
+  i.setAttribute('type', "text");
+  i.setAttribute('name', "allTrackId");
+  i.setAttribute('value', playlistItem);
+  f.appendChild(i);
 
+  var i = document.createElement("input"); //input element, text
+  i.setAttribute('type', "text");
+  i.setAttribute('name', "name");
+  i.setAttribute('value', name);
+  f.appendChild(i);
 
+  var s = document.createElement("input"); //input element, Submit button
+  s.setAttribute('type', "submit");
+  s.setAttribute('value', "Submit");
+  f.appendChild(s);
 
-var s = document.createElement("input"); //input element, Submit button
-s.setAttribute('type',"submit");
-s.setAttribute('value',"Submit");
+  document.body.appendChild(f);
 
-f.appendChild(i);
-f.appendChild(s);
-document.body.appendChild(f);
+  clearLocalStorage();
 
-clearLocalStorage();
+  f.submit();
+}
 
-f.submit();
-	 
-	 
-	 }
- 
- function deleteRow(btnRemove)
- {
-	 a = btnRemove;
-	 console.log(btnRemove.currentTarget)
-	  console.log(btnRemove.target)
-	 btnRemove = $(btnRemove.currentTarget);
-		//console.log("remove "+id);
-		let elToRemove = btnRemove.parent().parent();
-		storage.splice(elToRemove.index(),1)
-		elToRemove.remove();
-		//btnRemove.parent().parent().remove();
-		saveLocal();
-		
-	}
- 
- 
- inputName.addEventListener("keyup",e => {
-	 localStorage.setItem("name",e.target.value);
- });
- 
- document.getElementById("btn-save").addEventListener("click",save);
- 
- function clearLocalStorage()
- {
-	 window.localStorage.removeItem('name');
-	 window.localStorage.removeItem('playlist');
- }
+/**
+* Delete row from playlist item
+*/
+function deleteRow(btnRemove) {
+  btnRemove = $(btnRemove.currentTarget);
+  let elToRemove = btnRemove.parent().parent();
+  storage.splice(elToRemove.index(), 1)
+  elToRemove.remove();
+  saveLocal();
+}
+
+/**
+* On keypress save to localstorage
+*/
+inputName.addEventListener("keyup", e => {
+  localStorage.setItem("name", e.target.value);
+});
+
+/**
+* Clear local storage
+*/
+function clearLocalStorage() {
+  window.localStorage.removeItem('name');
+  window.localStorage.removeItem('playlist');
+}
+
+document.getElementById("btn-save").addEventListener("click", save);
 </script>
 </html>

@@ -21,10 +21,10 @@ public class ContentId implements Serializable {
 	
 	@Column(name = "con_position",nullable = false)
 	private int position;
+	
 	/*
 	 * Get/Set
 	 */
-	
 	public ContentId(Playlist p, Track t, int pos)
 	{
 		this.playlist = p;
@@ -60,8 +60,4 @@ public class ContentId implements Serializable {
 	public void setPosition(int position) {
 		this.position = position;
 	}
-
-	
-	
-
 }

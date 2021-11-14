@@ -45,7 +45,6 @@ public class Track {
 			@JoinColumn(name = "art_id") })
 	Set<Artist> artists = new HashSet<>();
 	
-
 	/*
 	 * Constructor
 	 */
@@ -100,7 +99,6 @@ public class Track {
 		this.artists = artists;
 	}
 	
-	
 	public String getArtistsString() {
 		String art = ""; // from your method
 		for(Artist x : artists) {
@@ -110,8 +108,4 @@ public class Track {
 		art = art.substring(0,art.length()-2);
 		return art;
 	}
-
-
-	
-
 }

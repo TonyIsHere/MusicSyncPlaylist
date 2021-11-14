@@ -30,6 +30,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 		UserDetails user = new org.springframework.security.core.userdetails.User(username, curruser.getPasswordHash(),
 				AuthorityUtils.createAuthorityList(curruser.getRole().toString()));
 
+		//Save id on session
 		session.setAttribute("id", curruser.getId());
 		return user;
 	}

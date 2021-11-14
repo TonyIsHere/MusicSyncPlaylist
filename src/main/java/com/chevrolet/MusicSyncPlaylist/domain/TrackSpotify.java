@@ -16,6 +16,7 @@ public class TrackSpotify extends Track {
 	 */
 	@Column(name = "tra_spo_id",nullable = false,length = 22)
 	private String spotify;
+	
 	@Column(name = "tra_spo_preview")
 	private String preview;
 

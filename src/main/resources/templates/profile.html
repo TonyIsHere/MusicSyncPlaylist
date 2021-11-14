@@ -30,36 +30,45 @@
 	<div th:insert="navbar">...</div>
 	<div class="container">
 		<div class="row" style="margin-top: 10px">
-			<div class="col col-md-6">
+			<div class="col-md-6 col-sm-12">
+				<h2>Profile</h2>
 				<form>
 					<div class="mb-3">
-						<label for="inputEmail" class="form-label">Email address</label> 
-							<input th:value="${user.email}" readonly type="email" class="form-control" id="inputEmail">
-					</div>	
+						<label for="inputEmail" class="form-label">Email address</label> <input
+							th:value="${user.email}" readonly type="email"
+							class="form-control" id="inputEmail">
+					</div>
 					<div class="mb-3">
-						<label for="inputUsername" class="form-label">Username</label> 
-							<input th:value="${user.nickname}" readonly type="text" class="form-control" id="inputUsername">
-					</div>	
+						<label for="inputUsername" class="form-label">Username</label> <input
+							th:value="${user.nickname}" readonly type="text"
+							class="form-control" id="inputUsername">
+					</div>
 					<div class="mb-3">
-						<label for="inputRole" class="form-label">Role</label> 
-							<input th:value="${user.role}" readonly type="text" class="form-control" id="inputRole">
-					</div>	
+						<label for="inputRole" class="form-label">Role</label> <input
+							th:value="${user.role}" readonly type="text" class="form-control"
+							id="inputRole">
+					</div>
 				</form>
 			</div>
-			<div class="col col-md-6">
+			<div class="col-md-6 col-sm-12">
+				<h2>My playlist</h2>
 				<ul class="list-unstyled"
 					style="max-height: 70vh; overflow-y: auto;">
-					<li th:each="item : ${playlist}" class="border rounded item-to-add"
+					<li th:each="item : ${playlist}" class="border"
 						style="padding: 10px; margin-top: 10px">
 						<div class="d-flex align-items-center">
 							<div class="flex-shrink-0">
-								<img th:src="${item.picture}" alt="playlist picture"
+								<img th:if="${item.picture == Null}" src="https://cdn.pixabay.com/photo/2017/01/09/20/11/music-1967480_1280.png" alt="playlist picture"
+									class="img-thumbnail" style="width: 100px">
+									<img th:unless="${item.picture == Null}" th:src="${item.picture}" alt="playlist picture"
 									class="img-thumbnail" style="width: 100px">
 							</div>
 							<div class="flex-grow-1 ms-3">
-								<a th:href="'playlist/'+${item.id}"><h5 class="mt-0 mb-1"
+								<a th:href="'playlist/'+${item.id }"><h5 class="mt-0 mb-1"
 										th:text="${item.name}"></h5></a>
 							</div>
+							<button th:attr="data-id=|${item.id}|"
+								class="btn btn-danger btndelete">Delete</button>
 						</div>
 					</li>
 				</ul>
@@ -67,4 +76,15 @@
 		</div>
 	</div>
 </body>
+<script>
+$(".btndelete").each((i,x) => {
+	x.addEventListener("click",e =>{
+		if (window.confirm("Are you sure?"))
+			{
+		fetch("/api/playlist/"+e.target.dataset.id,{method:"DELETE"})
+		.then(_ => location.reload())
+			}
+	});
+});
+</script>
 </html>

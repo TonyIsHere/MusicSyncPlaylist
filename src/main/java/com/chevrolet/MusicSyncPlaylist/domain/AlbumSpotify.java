@@ -30,7 +30,6 @@ public class AlbumSpotify extends Album {
 		this.spotify = spotify;
 	}
 
-	
 	/*
 	 * Get/Set
 	 */
@@ -41,8 +40,4 @@ public class AlbumSpotify extends Album {
 	public void setSpotify(String spotify) {
 		this.spotify = spotify;
 	}
-	
-	
-	
-
 }

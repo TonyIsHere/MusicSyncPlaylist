@@ -47,7 +47,6 @@ public class Artist {
 	/*
 	 * Constructor
 	 */
-
 	public Artist() {
 
 	};

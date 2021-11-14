@@ -78,17 +78,16 @@ public class AppController {
 
 	@Autowired
 	private AlbumRepository alrepository;
-	
+
 	@Autowired
 	private UserRepository ulrepository;
-	
+
 	@Autowired
 	private PlaylistRepository plrepository;
-	
+
 	@Autowired
 	private ContentRepository crepository;
-	
-	
+
 	@Autowired
 	private HttpSession session;
 
@@ -96,17 +95,10 @@ public class AppController {
 	public String index() {
 		return "index";
 	}
-
-	@RequestMapping({ "/new" })
-	public String newPlaylist(Model model) {
-		model.addAttribute("search", new ArrayList<Object>());
-		return "createPlaylist";
-	}
-
+	
 	@RequestMapping({ "/search" })
 	public String search(@RequestParam(name = "q", required = false) String query, Model model) {
-		Object s = session;
-
+		
 		if (query != null && query != "") {
 			final String uri = "http://localhost:8080/api/search?q=" + query;
 
@@ -121,9 +113,9 @@ public class AppController {
 				List<TrackSpotify> find = tsrepository.findBySpotify(idSpotify);
 				track.add(find.get(0));
 			}
-
 			model.addAttribute("search", track);
 		}
+		
 		return "createPlaylist";
 	}
 
@@ -150,11 +142,9 @@ public class AppController {
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(body,
 				headers);
-		ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
+		ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class); //first  get access token
 		Map account = response.getBody();
 
-		HashMap<String, String> map2 = new HashMap<>();
-		map2.put("foo", "accoutn");
 		String access_token = account.get("access_token").toString();
 
 		HttpHeaders headerSearch = new HttpHeaders();
@@ -164,10 +154,15 @@ public class AppController {
 		String type = "track";
 
 		HttpEntity<String> entity = new HttpEntity<>("body", headerSearch);
+		
+		//do the search on api
 		ResponseEntity<Map> responseSearch = restTemplate.exchange(
 				urlApi + String.format("/v1/search?q=%s&type=%s", query, type), HttpMethod.GET, entity, Map.class);
-		;
+			
 		Map jsondata = (Map) responseSearch.getBody().get("tracks");
+		
+		
+		//get result from spotify API
 		List<Object> data = (List<Object>) jsondata.get("items");
 
 		for (int i = 0; i < data.size(); i++) {
@@ -341,8 +336,7 @@ public class AppController {
 				logmessage += "AlbumSpotify exist Yes | ";
 				Album a = albumSpotify.get(0);
 				List<Track> tracksOfPlaylist = a.getTracks();
-				Object[] trackofAlbum = tracksOfPlaylist.stream().filter(x -> (x.getName() == nametrack))
-						.toArray();
+				Object[] trackofAlbum = tracksOfPlaylist.stream().filter(x -> (x.getName() == nametrack)).toArray();
 				if (trackofAlbum.length == 0) {
 					// Create Track linked to album
 					logmessage += "Track exist No  | ";
@@ -380,13 +374,16 @@ public class AppController {
 		log.warn(logmessage);
 	}
 
+	/**
+	 * Check if artist exist in db
+	 */
 	private Artist checkArtistSpotify(Map data) {
 		String nameart = data.get("name").toString();
 		String idArt = data.get("id").toString();
 
 		List<ArtistSpotify> artistSpotify = asrepository.findBySpotify(idArt);
-		if (artistSpotify.isEmpty()) {
-			ArtistSpotify newArt = new ArtistSpotify(nameart, null, null, idArt);
+		if (artistSpotify.isEmpty()) { 
+			ArtistSpotify newArt = new ArtistSpotify(nameart, null, null, idArt); //not exist 
 			asrepository.save(newArt);
 			return newArt;
 		}
@@ -394,83 +391,83 @@ public class AppController {
 		return artistSpotify.get(0);
 
 	}
-	@RequestMapping({"/login"})
-	public String login(Model model)
-	{		 
-		return "login"; 
+
+	@RequestMapping({ "/login" })
+	public String login(Model model) {
+		return "login";
 	}
-	
-	@RequestMapping({"/playlist/{id}"})
-	public String login(@PathVariable("id") int playlistid,Model model)
-	{		 
+
+	@RequestMapping({ "/playlist/{id}" })
+	public String login(@PathVariable("id") int playlistid, Model model) {
 		Optional<Playlist> p = plrepository.findById(playlistid);
-		if(p.isEmpty())
-		{
+		if (p.isEmpty()) {
 			return "redirect:/login";
 		}
-		
-		model.addAttribute("playlist",p.get().getContents());
-		model.addAttribute("name",p.get().getName());
-		
-		
-		
-		return "playlist"; 
+
+		model.addAttribute("playlist", p.get().getContents());
+		model.addAttribute("name", p.get().getName());
+
+		return "playlist";
 	}
-	
-	@RequestMapping({"/track/{id}"})
-	public String track(@PathVariable("id") int trackid,Model model)
-	{		 
+
+	@RequestMapping({ "/track/{id}" })
+	public String track(@PathVariable("id") int trackid, Model model) {
 		Optional<Track> t = trepository.findById(trackid);
-		
-		
-		if(t.isEmpty())
-		{
+
+		if (t.isEmpty()) {
 			return "redirect:/login";
 		}
-		
-		model.addAttribute("track",t.get());
-		
-		return "track"; 
+
+		model.addAttribute("track", t.get());
+
+		return "track";
 	}
-	
-	@RequestMapping({"/profile"})
-	public String profile(Model model)
-	{		
+
+	@RequestMapping({ "/profile" })
+	public String profile(Model model) {
 		Integer idUser = (Integer) session.getAttribute("id");
 		Optional<User> u = ulrepository.findById(idUser);
 		User user = u.get();
-		
-		if(u == null)
-		{
+
+		if (u == null) {
 			return "login";
 		}
 		
-		model.addAttribute("playlist",user.getPlaylists());
-		model.addAttribute("user",user);
-		
-		
-		
-		return "allplaylist"; 
+		model.addAttribute("playlist", user.getPlaylists());
+		model.addAttribute("user", user);
+
+		return "profile";
 	}
-	@RequestMapping(value = "api/save", method = {RequestMethod.GET, RequestMethod.POST})
-	public String save(@RequestParam int id,Integer[] allTrackId,String name)
-	{		
-		Optional<User> u = ulrepository.findById(id);
-		Playlist p = new Playlist(name,u.get());
-		
-		p = plrepository.save(p);
-		
-	
-		for (int i = 0; i < allTrackId.length; i++) {
-			Optional<Track> t = trepository.findById((allTrackId[i]));
-			
-			ContentId idPk = new ContentId(p,t.get(),(i+1));
-			
-			Content row = new Content(idPk);
-			crepository.save(row);
+
+	@RequestMapping(value = "api/playlist/{id}", method = { RequestMethod.DELETE })
+	public String deletePlaylist(@PathVariable("id") Integer id) {
+
+		List<Content> allRow = crepository.findByPrimaryKeyPlaylistId(id);
+		for (Content content : allRow) { //delete first content
+			crepository.delete(content);
 		}
 		
-	
-		return "redirect:/playlist/"+p.getId(); 
+		plrepository.deleteById(id); //delete playlist
+		return "redirect:/profile";
+	}
+
+	@RequestMapping(value = "api/save", method = { RequestMethod.GET, RequestMethod.POST })
+	public String save(@RequestParam int id, Integer[] allTrackId, String name) {
+		Optional<User> u = ulrepository.findById(id); //get id 
+		Playlist p = new Playlist(name, u.get());
+
+		p = plrepository.save(p); //save playlist before to get id
+
+		for (int i = 0; i < allTrackId.length; i++) {
+			Optional<Track> t = trepository.findById((allTrackId[i])); //get track by id
+
+			ContentId idPk = new ContentId(p, t.get(), (i + 1)); //create the row item in the playlist
+			Content row = new Content(idPk);
+			
+			crepository.save(row); //save content 
+		}
+
+		//redirect to the new playlist
+		return "redirect:/playlist/" + p.getId();
 	}
 }

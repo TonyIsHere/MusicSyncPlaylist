@@ -31,5 +31,4 @@ public class Content {
 	public void setPrimaryKey(ContentId primaryKey) {
 		this.primaryKey = primaryKey;
 	}
-
 }

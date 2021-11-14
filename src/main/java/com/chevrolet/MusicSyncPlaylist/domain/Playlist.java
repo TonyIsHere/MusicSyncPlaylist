@@ -27,7 +27,6 @@ public class Playlist {
 	@Column(name = "pla_name", nullable = false,length = 50)
 	private String name;
 	
-	
 	@Column(name = "pla_picture")
 	private String picture;
 	
@@ -37,10 +36,7 @@ public class Playlist {
 	
 	@OneToMany(mappedBy = "primaryKey.playlist")
 	List<Content> contents;
-	
-
-
-	
+		
 	/*
 	 * Constructor
 	 */
@@ -53,12 +49,9 @@ public class Playlist {
     	this.user = u;
   	}
 
-
-
 	/*
 	 * Get/Set
 	 */
-	
 	public int getId() {
 		return id;
 	}
@@ -97,9 +90,5 @@ public class Playlist {
 
 	public void setContents(List<Content> contents) {
 		this.contents = contents;
-	}
-
-
-	
-	
+	}	
 }

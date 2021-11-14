@@ -41,7 +41,8 @@
 					th:href="'https://open.spotify.com/track/' + ${track.spotify}"><i class="fab fa-spotify"></i> Spotify
 					link</a> 
 					<br/>
-					<span th:if="${track.preview == Null}"></span> <span
+					<span th:if="${track.preview == Null}"></span>
+					<span
 					th:unless="${track.preview == Null }"> <audio
 						th:id="'btn_'+${track.id}" controls
 						style="height: revert; width: 100%">
