@@ -24,8 +24,44 @@ public class ContentId implements Serializable {
 	/*
 	 * Get/Set
 	 */
+	
+	public ContentId(Playlist p, Track t, int pos)
+	{
+		this.playlist = p;
+		this.track = t;
+		this.position = pos;
+	}
+	
+	public ContentId()
+	{
+		
+	}
 
+	public Playlist getPlaylist() {
+		return playlist;
+	}
 
+	public void setPlaylist(Playlist playlist) {
+		this.playlist = playlist;
+	}
+
+	public Track getTrack() {
+		return track;
+	}
+
+	public void setTrack(Track track) {
+		this.track = track;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	
 	
 
 }

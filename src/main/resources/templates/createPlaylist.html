@@ -27,8 +27,13 @@
 <title>New Playlist</title>
 </head>
 <body>
+	<div th:insert="navbar">...</div>
 	<div class="container">
+	<form id="lol" th:action="@{/api/save}" method="POST"></form>
+		<h3 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h3>
 		<h1 th:text="'New Playlist'"></h1>
+		<div id="datajsid" class="d-none" th:text="${session.id}">John
+			Doe</div>
 		<div class="row">
 			<div class="col-12">
 				<form action="#" th:action="@{/search}" method="GET"
@@ -50,6 +55,21 @@
 						<!--end of col-->
 					</div>
 				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<div class="card-body row no-gutters align-items-center">
+					<div class="col-auto">
+						<i class="h4 text-body">Name</i>
+					</div>
+					<!--end of col-->
+					<div class="col">
+						<input id="inputName"
+							class="form-control form-control-lg form-control-borderless"
+							type="search" placeholder="Name playlist">
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="row" style="margin-top: 10px">
@@ -108,10 +128,19 @@
 let storage = [];
 let a;
 
+let idUser = parseInt($(datajsid).html());
+$(datajsid).remove()
+
 function saveLocal()
 {
 	localStorage.setItem("playlist",JSON.stringify(storage));
 	
+	}
+
+
+if(localStorage.getItem("name"))
+	{
+	inputName.value =localStorage.getItem("name"); 
 	}
 
 if(localStorage.getItem("playlist"))
@@ -194,8 +223,51 @@ function playAudio(btnid)
 		 let id = x.id.split("-")[2];
 		 playlistItem.push(id);
 	 })
+	 
+	 let name = inputName.value;
+	 console.log(name);
 	 console.log(playlistItem);
+	 console.log(idUser);
 	 console.log("save");
+	 
+
+	 
+	 var f = lol;
+f.setAttribute('method',"post");
+f.setAttribute('action',"api/save");
+
+var i = document.createElement("input"); //input element, text
+i.setAttribute('type',"text");
+i.setAttribute('name',"id");
+i.setAttribute('value',idUser);
+f.appendChild(i);
+
+var i = document.createElement("input"); //input element, text
+i.setAttribute('type',"text");
+i.setAttribute('name',"allTrackId");
+i.setAttribute('value',playlistItem);
+f.appendChild(i);
+
+var i = document.createElement("input"); //input element, text
+i.setAttribute('type',"text");
+i.setAttribute('name',"name");
+i.setAttribute('value',name);
+f.appendChild(i);
+
+
+
+
+var s = document.createElement("input"); //input element, Submit button
+s.setAttribute('type',"submit");
+s.setAttribute('value',"Submit");
+
+f.appendChild(i);
+f.appendChild(s);
+document.body.appendChild(f);
+
+clearLocalStorage();
+
+f.submit();
 	 
 	 
 	 }
@@ -215,6 +287,17 @@ function playAudio(btnid)
 		
 	}
  
+ 
+ inputName.addEventListener("keyup",e => {
+	 localStorage.setItem("name",e.target.value);
+ });
+ 
  document.getElementById("btn-save").addEventListener("click",save);
+ 
+ function clearLocalStorage()
+ {
+	 window.localStorage.removeItem('name');
+	 window.localStorage.removeItem('playlist');
+ }
 </script>
 </html>

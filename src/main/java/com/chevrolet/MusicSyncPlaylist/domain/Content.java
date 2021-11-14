@@ -15,6 +15,21 @@ import javax.persistence.JoinColumn;
 public class Content {
 
     @EmbeddedId
-	private ContentId primaryKey = new ContentId();
+	private ContentId primaryKey;
+    
+	public Content() {
+    	
+    }
+    public Content(ContentId pk)
+    {
+    	this.primaryKey = pk;
+    }
+    
+    public ContentId getPrimaryKey() {
+		return primaryKey;
+	}
+	public void setPrimaryKey(ContentId primaryKey) {
+		this.primaryKey = primaryKey;
+	}
 
 }

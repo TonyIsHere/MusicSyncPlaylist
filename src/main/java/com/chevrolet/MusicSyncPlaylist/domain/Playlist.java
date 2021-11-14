@@ -1,6 +1,7 @@
 package com.chevrolet.MusicSyncPlaylist.domain;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -34,14 +35,24 @@ public class Playlist {
 	@JoinColumn(name = "pla_use_id",nullable = false)
 	private User user;
 	
+	@OneToMany(mappedBy = "primaryKey.playlist")
+	List<Content> contents;
+	
 
 
+	
 	/*
 	 * Constructor
 	 */
     public Playlist() {
 
 	}
+    
+    public Playlist(String name,User u) {
+    	this.name = name;
+    	this.user = u;
+  	}
+
 
 
 	/*
@@ -78,6 +89,14 @@ public class Playlist {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public List<Content> getContents() {
+		return contents;
+	}
+
+	public void setContents(List<Content> contents) {
+		this.contents = contents;
 	}
 
 

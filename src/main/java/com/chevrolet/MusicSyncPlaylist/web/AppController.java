@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.Convert;
+import javax.servlet.http.HttpSession;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
@@ -29,22 +30,34 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.WebRequest;
 
 import com.chevrolet.MusicSyncPlaylist.domain.Album;
 import com.chevrolet.MusicSyncPlaylist.domain.AlbumSpotify;
 import com.chevrolet.MusicSyncPlaylist.domain.Artist;
 import com.chevrolet.MusicSyncPlaylist.domain.ArtistSpotify;
+import com.chevrolet.MusicSyncPlaylist.domain.Content;
+import com.chevrolet.MusicSyncPlaylist.domain.ContentId;
+import com.chevrolet.MusicSyncPlaylist.domain.Playlist;
 import com.chevrolet.MusicSyncPlaylist.domain.Track;
 import com.chevrolet.MusicSyncPlaylist.domain.TrackSpotify;
+import com.chevrolet.MusicSyncPlaylist.domain.User;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.AlbumRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.AlbumSpotifyRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.ArtistSpotifyRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.ContentRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.PlaylistRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.TrackRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.TrackSpotifyRepository;
+import com.chevrolet.MusicSyncPlaylist.domain.repository.UserRepository;
 
 @Controller
 public class AppController {
@@ -65,6 +78,19 @@ public class AppController {
 
 	@Autowired
 	private AlbumRepository alrepository;
+	
+	@Autowired
+	private UserRepository ulrepository;
+	
+	@Autowired
+	private PlaylistRepository plrepository;
+	
+	@Autowired
+	private ContentRepository crepository;
+	
+	
+	@Autowired
+	private HttpSession session;
 
 	@RequestMapping({ "/" })
 	public String index() {
@@ -79,7 +105,7 @@ public class AppController {
 
 	@RequestMapping({ "/search" })
 	public String search(@RequestParam(name = "q", required = false) String query, Model model) {
-
+		Object s = session;
 
 		if (query != null && query != "") {
 			final String uri = "http://localhost:8080/api/search?q=" + query;
@@ -367,5 +393,84 @@ public class AppController {
 
 		return artistSpotify.get(0);
 
+	}
+	@RequestMapping({"/login"})
+	public String login(Model model)
+	{		 
+		return "login"; 
+	}
+	
+	@RequestMapping({"/playlist/{id}"})
+	public String login(@PathVariable("id") int playlistid,Model model)
+	{		 
+		Optional<Playlist> p = plrepository.findById(playlistid);
+		if(p.isEmpty())
+		{
+			return "redirect:/login";
+		}
+		
+		model.addAttribute("playlist",p.get().getContents());
+		model.addAttribute("name",p.get().getName());
+		
+		
+		
+		return "playlist"; 
+	}
+	
+	@RequestMapping({"/track/{id}"})
+	public String track(@PathVariable("id") int trackid,Model model)
+	{		 
+		Optional<Track> t = trepository.findById(trackid);
+		
+		
+		if(t.isEmpty())
+		{
+			return "redirect:/login";
+		}
+		
+		model.addAttribute("track",t.get());
+		
+		return "track"; 
+	}
+	
+	@RequestMapping({"/profile"})
+	public String profile(Model model)
+	{		
+		Integer idUser = (Integer) session.getAttribute("id");
+		Optional<User> u = ulrepository.findById(idUser);
+		User user = u.get();
+		
+		if(u == null)
+		{
+			return "login";
+		}
+		
+		model.addAttribute("playlist",user.getPlaylists());
+		model.addAttribute("user",user);
+		
+		
+		
+		return "allplaylist"; 
+	}
+	@RequestMapping(value = "api/save", method = {RequestMethod.GET, RequestMethod.POST})
+	public String save(@RequestParam int id,Integer[] allTrackId,String name)
+	{		
+		Optional<User> u = ulrepository.findById(id);
+		Playlist p = new Playlist(name,u.get());
+		
+		p = plrepository.save(p);
+		
+	
+		for (int i = 0; i < allTrackId.length; i++) {
+			Optional<Track> t = trepository.findById((allTrackId[i]));
+			
+			ContentId idPk = new ContentId(p,t.get(),(i+1));
+			
+			Content row = new Content(idPk);
+			crepository.save(row);
+		}
+		
+	
+		return "redirect:/playlist/"+p.getId(); 
 	}
 }
