@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous">
+<title>Server Programming</title>
+</head>
+<body>
+	<div th:insert="navbar">...</div>
+	<div class="container">
+		<div class="row justify-content-md-center" style="margin-top: 10px">
+			<div class="col col-md-6">
+				<h2 th:text="${album.name}" class="text-center" >Name</h2>
+				<ul class="list-unstyled"
+					style="max-height: 70vh; overflow-y: auto;">
+					<li th:each="item : ${contents}"
+						th:id="'item-search-'+${item.id}"
+						class="border rounded item-to-add"
+						style="padding: 10px; margin-top: 10px">
+						<div class="d-flex align-items-center">
+							<div class="flex-shrink-0">
+								<img th:src="${item.album.picture}"
+									alt="playlist" class="img-thumbnail" style="width: 100px">
+							</div>
+							<div class="flex-grow-1 ms-3">
+								<h5 class="mt-0 mb-1" th:text="${item.name}"></h5>
+								<p th:text="${item.getArtistsString}"></p>
+								<span th:if="${item.preview == Null}"></span> 
+								<span th:unless="${item.preview == Null }">
+									<Button
+										th:attr="onclick=|playAudio('${item.id}')|">Play
+										preview</Button> <audio th:id="'btn_'+${item.id}"
+										controls class="d-none" style="height: revert; width: 100%">
+										<source th:src="${item.preview}"
+											type="audio/mpeg">
+										Your browser does not support the audio element.
+									</audio>
+								</span>
+							</div>
+							<a type="button"th:href="'/track/'+${item.id}" class="btn btn-success btn-lg float-right btn-add">
+								more...
+							</a>
+						</div>
+						<a target="_blank"
+						th:href="'https://open.spotify.com/track/' + ${item.spotify}">Spotify
+							link</a>
+						</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

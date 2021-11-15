@@ -22,9 +22,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+//https://www.section.io/engineering-education/springboot-antmatchers/
 		http.csrf().disable()
 		.authorizeRequests()
-		.antMatchers("/api/**").permitAll()
+		.antMatchers("/api/**","/new").permitAll()
 		.antMatchers(HttpMethod.DELETE, "/api/playlist/{id}").permitAll()
 		.anyRequest().authenticated()
 		.and()

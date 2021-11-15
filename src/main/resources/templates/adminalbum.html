@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous">
+<title>Albums backend</title>
+</head>
+<body>
+	<div th:insert="navbar">...</div>
+	<div class="container">
+		<div class="row" style="margin-top: 10px">
+			<div class="col col-md-12">
+				<table class="table table-striped">
+					<tr>
+						<th>Id</th>
+						<th>Picture</th>
+						<th>Name</th>
+						<th>Date</th>
+						<th>Link</th>
+					</tr>
+					<tr th:each="item : ${albums}">
+					<td th:text="${item.id}"></td>
+					<td><img class="img img-fluid img-thumbnail" style="width: 70px;" th:src="${item.picture}" /></td>
+						<td th:text="${item.name}"></td>
+						<td th:text="${item.release}"></td>
+							<td><a  th:href="'/album/'+${item.id}"><button class="btn btn-primary">More...</button> </a></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,44 +1,42 @@
 package com.chevrolet.MusicSyncPlaylist.web;
 
-import java.sql.Date;
+
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.persistence.Convert;
 import javax.servlet.http.HttpSession;
 
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.WebRequest;
 
 import com.chevrolet.MusicSyncPlaylist.domain.Album;
 import com.chevrolet.MusicSyncPlaylist.domain.AlbumSpotify;
@@ -47,6 +45,7 @@ import com.chevrolet.MusicSyncPlaylist.domain.ArtistSpotify;
 import com.chevrolet.MusicSyncPlaylist.domain.Content;
 import com.chevrolet.MusicSyncPlaylist.domain.ContentId;
 import com.chevrolet.MusicSyncPlaylist.domain.Playlist;
+import com.chevrolet.MusicSyncPlaylist.domain.Roles;
 import com.chevrolet.MusicSyncPlaylist.domain.Track;
 import com.chevrolet.MusicSyncPlaylist.domain.TrackSpotify;
 import com.chevrolet.MusicSyncPlaylist.domain.User;
@@ -58,6 +57,7 @@ import com.chevrolet.MusicSyncPlaylist.domain.repository.PlaylistRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.TrackRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.TrackSpotifyRepository;
 import com.chevrolet.MusicSyncPlaylist.domain.repository.UserRepository;
+
 
 @Controller
 public class AppController {
@@ -91,14 +91,45 @@ public class AppController {
 	@Autowired
 	private HttpSession session;
 
+	//For hash psw//
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@Bean
+	public PasswordEncoder encoder() {
+	    return new BCryptPasswordEncoder();
+	}
+	//
+
+	@PreAuthorize("hasAuthority('ADMIN')") //Importante before requestmapping
+	@RequestMapping({ "/admin" })
+	public String admin() {
+		return "admin";
+	}
+	
+	@PreAuthorize("hasAuthority('ADMIN')") //Importante before requestmapping
+	@RequestMapping({ "/admin/tracks" })
+	public String admintracks( Model model) {
+		model.addAttribute("tracks",trepository.findAll());
+		return "admintrack";
+	}
+	
+	@PreAuthorize("hasAuthority('ADMIN')") //Importante before requestmapping
+	@RequestMapping({ "/admin/albums" })
+	public String adminalbum( Model model) {
+		model.addAttribute("albums",alrepository.findAll());
+		return "adminalbum";
+	}
+	
+	
 	@RequestMapping({ "/" })
 	public String index() {
 		return "index";
 	}
-	
+
 	@RequestMapping({ "/search" })
 	public String search(@RequestParam(name = "q", required = false) String query, Model model) {
-		
+
 		if (query != null && query != "") {
 			final String uri = "http://localhost:8080/api/search?q=" + query;
 
@@ -115,7 +146,7 @@ public class AppController {
 			}
 			model.addAttribute("search", track);
 		}
-		
+
 		return "createPlaylist";
 	}
 
@@ -142,7 +173,8 @@ public class AppController {
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(body,
 				headers);
-		ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class); //first  get access token
+		ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class); // first get
+																										// access token
 		Map account = response.getBody();
 
 		String access_token = account.get("access_token").toString();
@@ -154,15 +186,14 @@ public class AppController {
 		String type = "track";
 
 		HttpEntity<String> entity = new HttpEntity<>("body", headerSearch);
-		
-		//do the search on api
+
+		// do the search on api
 		ResponseEntity<Map> responseSearch = restTemplate.exchange(
 				urlApi + String.format("/v1/search?q=%s&type=%s", query, type), HttpMethod.GET, entity, Map.class);
-			
+
 		Map jsondata = (Map) responseSearch.getBody().get("tracks");
-		
-		
-		//get result from spotify API
+
+		// get result from spotify API
 		List<Object> data = (List<Object>) jsondata.get("items");
 
 		for (int i = 0; i < data.size(); i++) {
@@ -382,8 +413,8 @@ public class AppController {
 		String idArt = data.get("id").toString();
 
 		List<ArtistSpotify> artistSpotify = asrepository.findBySpotify(idArt);
-		if (artistSpotify.isEmpty()) { 
-			ArtistSpotify newArt = new ArtistSpotify(nameart, null, null, idArt); //not exist 
+		if (artistSpotify.isEmpty()) {
+			ArtistSpotify newArt = new ArtistSpotify(nameart, null, null, idArt); // not exist
 			asrepository.save(newArt);
 			return newArt;
 		}
@@ -422,7 +453,23 @@ public class AppController {
 
 		return "track";
 	}
+	
+	@RequestMapping({ "/album/{id}" })
+	public String album(@PathVariable("id") int albumid, Model model) {
+		Optional<Album> a = alrepository.findById(albumid);
 
+		if (a.isEmpty()) {
+			return "redirect:/login";
+		}
+
+		model.addAttribute("album", a.get());
+		model.addAttribute("contents", a.get().getTracks());
+
+		return "album";
+	}
+
+	
+	
 	@RequestMapping({ "/profile" })
 	public String profile(Model model) {
 		Integer idUser = (Integer) session.getAttribute("id");
@@ -432,7 +479,7 @@ public class AppController {
 		if (u == null) {
 			return "login";
 		}
-		
+
 		model.addAttribute("playlist", user.getPlaylists());
 		model.addAttribute("user", user);
 
@@ -443,31 +490,55 @@ public class AppController {
 	public String deletePlaylist(@PathVariable("id") Integer id) {
 
 		List<Content> allRow = crepository.findByPrimaryKeyPlaylistId(id);
-		for (Content content : allRow) { //delete first content
+		for (Content content : allRow) { // delete first content
 			crepository.delete(content);
 		}
-		
-		plrepository.deleteById(id); //delete playlist
+
+		plrepository.deleteById(id); // delete playlist
 		return "redirect:/profile";
 	}
 
 	@RequestMapping(value = "api/save", method = { RequestMethod.GET, RequestMethod.POST })
 	public String save(@RequestParam int id, Integer[] allTrackId, String name) {
-		Optional<User> u = ulrepository.findById(id); //get id 
+		Optional<User> u = ulrepository.findById(id); // get id
 		Playlist p = new Playlist(name, u.get());
 
-		p = plrepository.save(p); //save playlist before to get id
+		p = plrepository.save(p); // save playlist before to get id
 
 		for (int i = 0; i < allTrackId.length; i++) {
-			Optional<Track> t = trepository.findById((allTrackId[i])); //get track by id
+			Optional<Track> t = trepository.findById((allTrackId[i])); // get track by id
 
-			ContentId idPk = new ContentId(p, t.get(), (i + 1)); //create the row item in the playlist
+			ContentId idPk = new ContentId(p, t.get(), (i + 1)); // create the row item in the playlist
 			Content row = new Content(idPk);
-			
-			crepository.save(row); //save content 
+
+			crepository.save(row); // save content
 		}
 
-		//redirect to the new playlist
+		// redirect to the new playlist
 		return "redirect:/playlist/" + p.getId();
 	}
+
+	
+	
+	@RequestMapping({ "/new" })
+	public String newAccount(@ModelAttribute User user) {
+		return "new";
+	}
+
+	@PostMapping("/new")
+	public String postAddAccount(@RequestParam String password, @RequestParam String confirm, @ModelAttribute User user,
+			Model model) throws Exception {
+		if (password.equals(confirm)) {
+			user.setPasswordHash(passwordEncoder.encode(password));
+			user.setRole(Roles.USER);
+			ulrepository.save(user);
+			return "redirect:/login";
+			
+		} else {
+			model.addAttribute("error", "error");
+			return "new";
+		}
+
+	}
+
 }
