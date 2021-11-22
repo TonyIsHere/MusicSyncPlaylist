@@ -1,6 +1,5 @@
 package com.chevrolet.MusicSyncPlaylist.domain;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,8 +16,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //https://thorben-janssen.com/complete-guide-inheritance-strategies-jpa-hibernate/
 @Entity

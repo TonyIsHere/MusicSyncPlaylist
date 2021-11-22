@@ -3,8 +3,6 @@ package com.chevrolet.MusicSyncPlaylist.domain;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -50,5 +48,4 @@ public class TrackSpotify extends Track {
 	public void setPreview(String preview) {
 		this.preview = preview;
 	}
-	
 }

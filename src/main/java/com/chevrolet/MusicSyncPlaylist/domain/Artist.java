@@ -1,7 +1,6 @@
 package com.chevrolet.MusicSyncPlaylist.domain;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -108,5 +107,4 @@ public class Artist {
 	public void setAlbums(Set<Album> albums) {
 		this.albums = albums;
 	}
-
 }

@@ -122,11 +122,6 @@ public class AppController {
 	}
 	
 	
-	@RequestMapping({ "/" })
-	public String index() {
-		return "index";
-	}
-
 	@RequestMapping({ "/search" })
 	public String search(@RequestParam(name = "q", required = false) String query, Model model) {
 
@@ -203,6 +198,10 @@ public class AppController {
 		return (Object) data;
 	}
 
+	/**
+	 * Check if a track exist on the database
+	 * @param data
+	 */
 	private void checkItem(Map data) {
 
 		// Track Spotify data
@@ -279,7 +278,7 @@ public class AppController {
 					Object[] albumByName = artist.getAlbums().stream().filter(x -> (x.getName() == album_name))
 							.toArray();
 
-					// Not working Api have 2 album with same name (L'école du micro d'argent) and
+					// Not working to use comparaison with contains --> Api have 2 album with same name (L'école du micro d'argent) and
 					// (L'école Du Micro D'argent) but not same id
 					/*
 					 * if (albumByName.length == 0) { albumByName =
@@ -300,7 +299,6 @@ public class AppController {
 
 					for (Artist artist : artNotLinked) {
 						// Create link between art and album
-						// refAlbum.getArtists().add(artist);
 						artist.getAlbums().add(refAlbum);
 					}
 
@@ -347,22 +345,6 @@ public class AppController {
 
 				}
 
-				//// if (artistSpotify.isEmpty()) {
-				// Create Artist, Album, Track
-				// } else {
-				// Check album by name
-				// Set<Album> albofArtist = artistSpotify.get(0).getAlbums();
-				// Object[] alb = albofArtist.stream().filter(x ->
-				// (x.getName().contains(album_name))).toArray();
-				// if (alb.length == 0) { //Alb not exist
-				// Create Album , Track and link
-				// } else {
-				// Check track of album
-				// if find --> create Spotify link
-				// else Create Track , and link ref to album existing
-				// }
-				// } c
-
 			} else {
 				logmessage += "AlbumSpotify exist Yes | ";
 				Album a = albumSpotify.get(0);
@@ -390,15 +372,6 @@ public class AppController {
 				}
 
 			}
-
-			// List<AlbumSpotify>
-			// check if is reference one time by another service
-
-			// List<Track> resultTrack = trepository.findByName(name);
-			// if()
-			// if(asrepository.findBySpotify(artid))
-			// Create new
-			// TrackSpotify track = new TrackSpotify();
 		} else {
 			logmessage += "TrackSpotify exist Yes | ";
 		}
@@ -420,7 +393,6 @@ public class AppController {
 		}
 
 		return artistSpotify.get(0);
-
 	}
 
 	@RequestMapping({ "/login" })
@@ -517,8 +489,6 @@ public class AppController {
 		// redirect to the new playlist
 		return "redirect:/playlist/" + p.getId();
 	}
-
-	
 	
 	@RequestMapping({ "/new" })
 	public String newAccount(@ModelAttribute User user) {

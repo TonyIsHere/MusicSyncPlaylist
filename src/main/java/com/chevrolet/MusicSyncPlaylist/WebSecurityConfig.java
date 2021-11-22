@@ -20,9 +20,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailServiceImpl userDetailsService;
 
+	//https://www.section.io/engineering-education/springboot-antmatchers/
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-//https://www.section.io/engineering-education/springboot-antmatchers/
 		http.csrf().disable()
 		.authorizeRequests()
 		.antMatchers("/api/**","/new").permitAll()
@@ -37,11 +37,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.logout()
 		.permitAll()
 		.invalidateHttpSession(true);
-		// .loginPage --> redirect url if not auth
-		// .defaultSuccessUrl --> if go on path /login and you're already
-		// logged --> path to redirect
 	}
 	
+	//Encryption password
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 	auth.userDetailsService(userDetailsService).passwordEncoder(new

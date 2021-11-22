@@ -1,7 +1,6 @@
 package com.chevrolet.MusicSyncPlaylist.domain;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,9 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Track {
@@ -99,6 +95,7 @@ public class Track {
 		this.artists = artists;
 	}
 	
+	/*Method*/
 	public String getArtistsString() {
 		String art = ""; // from your method
 		for(Artist x : artists) {
