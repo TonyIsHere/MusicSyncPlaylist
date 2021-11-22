@@ -53,4 +53,30 @@
 		</div>
 	</div>
 </body>
+<script>
+function playAudio(btnid)
+{
+	el = document.getElementById("btn_"+btnid);
+	
+	$('audio').each((i,x) => {
+		x.pause()
+		if(x !== el)
+			{
+			x.currentTime = 0;
+			}
+	});
+	console.log(el.currentTime);
+	if(el.currentTime != 0) //On listen
+		{
+		el.pause()
+		el.currentTime = 0;
+		}
+	else
+		{
+		el.currentTime = 0;
+		el.play();
+		}
+}
+
+</script>
 </html>
