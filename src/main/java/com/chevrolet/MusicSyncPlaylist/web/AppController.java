@@ -403,7 +403,8 @@ public class AppController {
 	@RequestMapping({ "/playlist/{id}" })
 	public String login(@PathVariable("id") int playlistid, Model model) {
 		Optional<Playlist> p = plrepository.findById(playlistid);
-		if (p.isEmpty()) {
+		String emptyTest = p.toString();
+		if (emptyTest.equals("Optional.empty")) {
 			return "redirect:/login";
 		}
 
@@ -416,8 +417,8 @@ public class AppController {
 	@RequestMapping({ "/track/{id}" })
 	public String track(@PathVariable("id") int trackid, Model model) {
 		Optional<Track> t = trepository.findById(trackid);
-
-		if (t.isEmpty()) {
+		String emptyTest = t.toString();
+		if (emptyTest.equals("Optional.empty")) {
 			return "redirect:/login";
 		}
 
@@ -430,7 +431,9 @@ public class AppController {
 	public String album(@PathVariable("id") int albumid, Model model) {
 		Optional<Album> a = alrepository.findById(albumid);
 
-		if (a.isEmpty()) {
+		String emptyTest = a.toString();
+		
+		if (emptyTest.equals("Optional.empty")) {
 			return "redirect:/login";
 		}
 
